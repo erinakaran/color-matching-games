@@ -1,0 +1,89 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Matching Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .color-option {
+            cursor: pointer;
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #000;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="text-center">
+        <h1 class="text-4xl font-bold mb-4">Color Matching Game</h1>
+        <div id="game" class="mb-4">
+            <p id="word" class="text-3xl font-bold"></p>
+            <div id="options" class="mt-4"></div>
+        </div>
+        <p id="timer" class="text-xl font-bold"></p>
+        <p id="score" class="text-xl font-bold mt-4"></p>
+    </div>
+
+    <script>
+        const words = ["RED", "GREEN", "BLUE", "YELLOW", "PURPLE", "ORANGE", "PINK", "BROWN", "BLACK", "WHITE"];
+        const colors = ["red", "green", "blue", "yellow", "purple", "orange", "pink", "brown", "black", "white"];
+        let currentStep = 0;
+        let score = 0;
+        let timer;
+
+        function startGame() {
+            if (currentStep < 10) {
+                const wordIndex = Math.floor(Math.random() * words.length);
+                const colorIndex = (wordIndex + Math.floor(Math.random() * (colors.length - 1)) + 1) % colors.length;
+                document.getElementById("word").innerText = words[wordIndex];
+                document.getElementById("word").style.color = colors[colorIndex];
+
+                const optionsContainer = document.getElementById("options");
+                optionsContainer.innerHTML = "";
+                colors.forEach(color => {
+                    const option = document.createElement("div");
+                    option.className = "color-option";
+                    option.style.backgroundColor = color;
+                    option.onclick = () => checkAnswer(color, colors[colorIndex]);
+                    optionsContainer.appendChild(option);
+                });
+
+                startTimer();
+            } else {
+                endGame();
+            }
+        }
+
+        function startTimer() {
+            let timeLeft = 10;
+            document.getElementById("timer").innerText = `Time left: ${timeLeft}s`;
+            timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById("timer").innerText = `Time left: ${timeLeft}s`;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    currentStep++;
+                    startGame();
+                }
+            }, 1000);
+        }
+
+        function checkAnswer(selectedColor, correctColor) {
+            clearInterval(timer);
+            if (selectedColor === correctColor) {
+                score++;
+            }
+            currentStep++;
+            startGame();
+        }
+
+        function endGame() {
+            document.getElementById("game").innerHTML = "<p class='text-3xl font-bold'>Game Over</p>";
+            document.getElementById("score").innerText = `Your score: ${score}`;
+        }
+
+        startGame();
+    </script>
+</body>
+</html>
